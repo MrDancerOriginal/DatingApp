@@ -6,7 +6,6 @@ using API.Entities;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace API.Controllers;
 
 public class AccountController : BaseApiController
@@ -43,11 +42,12 @@ public class AccountController : BaseApiController
         };
     }
 
-    [HttpPost("login")]
+    [HttpPost("loginn")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(x =>
-            x.UserName == loginDto.UserName);
+        var user = await _context.Users
+        .Include(p => p.Photos)
+        .SingleOrDefaultAsync(x => x.UserName == loginDto.UserName);
 
         if (user == null) return Unauthorized("Invalid username");
 
@@ -58,10 +58,15 @@ public class AccountController : BaseApiController
         for (int i = 0; i < computedHash.Length; i++)
             if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
 
+        UserDto userDto = new UserDto();
+        userDto.Username = user.UserName;
+        userDto.Token = _tokenService.CreateToken(user);
+
         return new UserDto
         {
             Username = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain).Url
         };
     }
 
