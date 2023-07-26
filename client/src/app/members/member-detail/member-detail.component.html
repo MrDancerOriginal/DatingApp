@@ -15,11 +15,11 @@
         </div>
         <div>
           <strong>Last active:</strong>
-          <p>{{member.lastActive}}</p>
+          <p>{{member.lastActive + 'Z'| timeago}}</p>
         </div>
         <div>
           <strong>Member since:</strong>
-          <p>{{member.created}}</p>
+          <p>{{member.created | date: 'longDate'}}</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
       </tab>
       <tab heading="Interests">
         <h4>Interests</h4>
-        <!--<p>{{member.interests}}</p>-->
+        <p>{{member.interests}}</p>
       </tab>
       <tab heading="Photos">
         <ngx-gallery [options]="galleryOptions"
