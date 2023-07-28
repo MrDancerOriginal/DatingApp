@@ -14,17 +14,10 @@ public class LikesController : BaseApiController
 {
     private readonly IUserRepository _userRepository;
     private readonly ILikesRepository _likesRepository;
-    private readonly DataContext _context;
-    public LikesController(IUserRepository userRepository, ILikesRepository likesRepository, DataContext context)
+    public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
     {
-        _context = context;
         _likesRepository = likesRepository;
         _userRepository = userRepository;
-    }
-
-    public void Reset()
-    {
-        _context.Likes.RemoveRange(_context.Likes);
     }
 
     [HttpPost("{username}")]
