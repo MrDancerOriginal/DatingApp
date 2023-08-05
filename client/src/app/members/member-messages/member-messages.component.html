@@ -5,7 +5,8 @@
     </div>
 
     <ng-template #messagesList>
-      <ul class="chat">
+      <ul class="chat" #scrollMe style="overflow-y: scroll; height: 500px;"
+          [scrollTop]="scrollMe.scrollHeight">
         <li *ngFor="let message of (messageService.messageThread$ | async)">
           <div>
             <span class="chat-img float-end">
