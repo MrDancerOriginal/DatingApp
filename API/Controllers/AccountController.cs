@@ -63,6 +63,16 @@ public class AccountController : BaseApiController
         userDto.Username = user.UserName;
         userDto.Token = await _tokenService.CreateToken(user);
 
+        if (loginDto.UserName == "admin")
+            return new UserDto
+            {
+                Username = user.UserName,
+                Token = await _tokenService.CreateToken(user),
+                PhotoUrl = "",
+                KnownAs = "admin",
+                Gender = "male"
+            };
+
         return new UserDto
         {
             Username = user.UserName,
