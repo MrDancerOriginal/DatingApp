@@ -1,13 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Message } from '../../models/message';
+import { FormsModule, NgForm } from '@angular/forms';
+import { TimeagoModule } from 'ngx-timeago';
 import { MessageService } from '../../services/message.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-member-messages',
   templateUrl: './member-messages.component.html',
-  styleUrls: ['./member-messages.component.css']
+  styleUrls: ['./member-messages.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, TimeagoModule]
 })
 export class MemberMessagesComponent implements OnInit {
   @ViewChild('messageForm') messageForm?: NgForm;

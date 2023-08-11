@@ -1,7 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryOptions } from '@kolkov/ngx-gallery';
-import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
+import { ActivatedRoute } from '@angular/router';
+import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
+import { TabDirective, TabsetComponent, TabsModule } from 'ngx-bootstrap/tabs';
+import { TimeagoModule } from 'ngx-timeago';
 import { take } from 'rxjs';
 import { Member } from '../../models/member';
 import { Message } from '../../models/message';
@@ -9,19 +11,20 @@ import { User } from '../../models/user';
 import { AccountService } from '../../services/account.service';
 import { MessageService } from '../../services/message.service';
 import { PresenseService } from '../../services/presense.service';
+import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 
 @Component({
   selector: 'app-member-detail',
   templateUrl: './member-detail.component.html',
-  styleUrls: ['./member-detail.component.css']
+  styleUrls: ['./member-detail.component.css'],
+  standalone: true,
+  imports: [GalleryModule, TabsModule, CommonModule, TimeagoModule, MemberMessagesComponent]
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
   @ViewChild('memberTabs', { static: true }) memberTabs?: TabsetComponent;
 
   member: Member = {} as Member;
-  galleryOptions: NgxGalleryOptions[] = [];
-  galleryImages: NgxGalleryImage[] = [];
-  
+  images: GalleryItem[] = [];
   activeTab?: TabDirective;
   messages: Message[] = [];
   user?: User;
@@ -29,8 +32,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   constructor(private accountService: AccountService,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    public presenseService: PresenseService,
-    private router: Router) {
+    public presenseService: PresenseService) {
 
     this.accountService.currentUser$.pipe(take(1)).subscribe({
       next: user => {
@@ -39,7 +41,6 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
   ngOnDestroy(): void {
@@ -53,39 +54,21 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
     this.route.queryParams.subscribe({
       next: params => {
-        params['tab'] && this.selectTab(params['tab'])
+        params['tab'] && this.selectTab(params['tab']);
       }
     });
 
-    this.galleryOptions = [
-      {
-        width: '500px',
-        height: '500px',
-        imagePercent: 100,
-        thumbnailsColumns: 4,
-        imageAnimation: NgxGalleryAnimation.Slide,
-        preview: false
-      }
-    ];
-
-    this.galleryImages = this.getImages();
+    this.getImages();
   }
 
   getImages() {
-    if (!this.member) return [];
-    const imageUrls = [];
+    if (!this.member) return;
 
     for (const photo of this.member.photos) {
       if (photo.isApproval) {
-        imageUrls.push({
-          small: photo.url,
-          medium: photo.url,
-          big: photo.url
-        });
+        this.images.push(new ImageItem({ src: photo.url, thumb: photo.url }));
       }
     }
-
-    return imageUrls;
   }
 
   selectTab(heading: string) {
